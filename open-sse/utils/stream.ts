@@ -1617,6 +1617,14 @@ export function createSSEStream(options: StreamOptions = {}) {
                 const u = usage as Record<string, unknown> | null;
                 const prompt = Number(u?.prompt_tokens ?? u?.input_tokens ?? 0);
                 const completion = Number(u?.completion_tokens ?? u?.output_tokens ?? 0);
+                const reasoning = Number(
+                  u?.reasoning_tokens ??
+                    (u?.completion_tokens_details as Record<string, unknown> | undefined)
+                      ?.reasoning_tokens ??
+                    (u?.output_tokens_details as Record<string, unknown> | undefined)
+                      ?.reasoning_tokens ??
+                    0
+                );
                 const content = passthroughAccumulatedContent.trim() || "";
                 const message: Record<string, unknown> = {
                   role: "assistant",
@@ -1645,6 +1653,12 @@ export function createSSEStream(options: StreamOptions = {}) {
                   },
                   _streamed: true,
                 };
+                if (reasoning > 0) {
+                  (responseBody.usage as Record<string, unknown>).reasoning_tokens = reasoning;
+                  (responseBody.usage as Record<string, unknown>).completion_tokens_details = {
+                    reasoning_tokens: reasoning,
+                  };
+                }
                 onComplete({
                   status: 200,
                   usage,

@@ -154,6 +154,22 @@ export function filterUsageForFormat(usage, targetFormat) {
     ) {
       convertedUsage.output_tokens = convertedUsage.completion_tokens;
     }
+
+    // Preserve reasoning token details in Responses/Claude-style usage blocks.
+    if (
+      convertedUsage.reasoning_tokens !== undefined &&
+      convertedUsage.output_tokens_details === undefined
+    ) {
+      convertedUsage.output_tokens_details = {
+        reasoning_tokens: convertedUsage.reasoning_tokens,
+      };
+    }
+    if (
+      convertedUsage.reasoning_tokens === undefined &&
+      convertedUsage.output_tokens_details?.reasoning_tokens !== undefined
+    ) {
+      convertedUsage.reasoning_tokens = convertedUsage.output_tokens_details.reasoning_tokens;
+    }
   } else {
     // Claude → OpenAI: input_tokens → prompt_tokens
     if (convertedUsage.input_tokens !== undefined && convertedUsage.prompt_tokens === undefined) {
@@ -172,6 +188,24 @@ export function filterUsageForFormat(usage, targetFormat) {
       convertedUsage.completion_tokens !== undefined
     ) {
       convertedUsage.total_tokens = convertedUsage.prompt_tokens + convertedUsage.completion_tokens;
+    }
+
+    // Keep OpenAI compatibility for clients that only inspect one shape:
+    // - top-level usage.reasoning_tokens
+    // - usage.completion_tokens_details.reasoning_tokens
+    if (
+      convertedUsage.reasoning_tokens !== undefined &&
+      convertedUsage.completion_tokens_details === undefined
+    ) {
+      convertedUsage.completion_tokens_details = {
+        reasoning_tokens: convertedUsage.reasoning_tokens,
+      };
+    }
+    if (
+      convertedUsage.reasoning_tokens === undefined &&
+      convertedUsage.completion_tokens_details?.reasoning_tokens !== undefined
+    ) {
+      convertedUsage.reasoning_tokens = convertedUsage.completion_tokens_details.reasoning_tokens;
     }
   }
 

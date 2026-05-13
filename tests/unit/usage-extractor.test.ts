@@ -2,7 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 const { extractUsageFromResponse } = await import("../../open-sse/handlers/usageExtractor.ts");
-const { extractUsage } = await import("../../open-sse/utils/usageTracking.ts");
+const { extractUsage, filterUsageForFormat } = await import("../../open-sse/utils/usageTracking.ts");
+const { FORMATS } = await import("../../open-sse/translator/formats.ts");
 
 test("extractUsageFromResponse reads OpenAI chat completion usage", () => {
   const usage = extractUsageFromResponse(
@@ -326,4 +327,34 @@ test("extractUsage reads OpenAI streaming chunk with flat reasoning_tokens fallb
   assert.equal(usage.prompt_tokens, 80);
   assert.equal(usage.completion_tokens, 12);
   assert.equal(usage.reasoning_tokens, 5);
+});
+
+test("filterUsageForFormat injects completion_tokens_details for OpenAI when only reasoning_tokens is present", () => {
+  const filtered = filterUsageForFormat(
+    {
+      prompt_tokens: 90,
+      completion_tokens: 11,
+      total_tokens: 101,
+      reasoning_tokens: 6,
+    },
+    FORMATS.OPENAI
+  );
+
+  assert.equal((filtered as any).reasoning_tokens, 6);
+  assert.deepEqual((filtered as any).completion_tokens_details, { reasoning_tokens: 6 });
+});
+
+test("filterUsageForFormat derives reasoning_tokens for OpenAI from completion_tokens_details", () => {
+  const filtered = filterUsageForFormat(
+    {
+      prompt_tokens: 70,
+      completion_tokens: 9,
+      total_tokens: 79,
+      completion_tokens_details: { reasoning_tokens: 3 },
+    },
+    FORMATS.OPENAI
+  );
+
+  assert.equal((filtered as any).reasoning_tokens, 3);
+  assert.deepEqual((filtered as any).completion_tokens_details, { reasoning_tokens: 3 });
 });

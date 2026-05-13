@@ -37,7 +37,7 @@ test("sanitizeOpenAIResponse strips non-standard fields and preserves required t
   });
 });
 
-test("sanitizeOpenAIResponse extracts thinking, collapses newlines, strips final reasoning_content, and preserves tool calls", () => {
+test("sanitizeOpenAIResponse extracts thinking, collapses newlines, preserves reasoning_content, and preserves tool calls", () => {
   const sanitized = sanitizeOpenAIResponse({
     id: "chatcmpl_test",
     model: "gpt-4.1",
@@ -58,7 +58,7 @@ test("sanitizeOpenAIResponse extracts thinking, collapses newlines, strips final
   assert.equal((sanitized as any).choices[0].index, 2);
   assert.equal((sanitized as any).choices[0].finish_reason, "tool_calls");
   (assert as any).equal((sanitized as any).choices[0].message.content, "Hello\n\nworld");
-  assert.equal((sanitized as any).choices[0].message.reasoning_content, undefined);
+  assert.equal((sanitized as any).choices[0].message.reasoning_content, "internal chain");
   (assert as any).deepEqual((sanitized as any).choices[0].message.tool_calls, [{ id: "call_1" }]);
   assert.deepEqual((sanitized as any).choices[0].message.function_call, { name: "legacy" });
 });
@@ -130,7 +130,47 @@ test("sanitizeOpenAIResponse preserves reasoning token metadata and reasoning su
   assert.equal((sanitized as any).warning, undefined);
 });
 
-test("sanitizeOpenAIResponse strips reasoning_details-derived reasoning_content when visible text exists", () => {
+test("sanitizeOpenAIResponse mirrors reasoning_summary text into message.reasoning_content fallback", () => {
+  const sanitized = sanitizeOpenAIResponse({
+    id: "chatcmpl_summary_only",
+    model: "melma-zen",
+    choices: [
+      {
+        index: 0,
+        message: {
+          role: "assistant",
+          content: "Final answer only",
+        },
+      },
+    ],
+    reasoning_summary: { content: "Hidden chain of thought summary", status: "available" },
+  });
+
+  assert.equal(
+    (sanitized as any).choices[0].message.reasoning_content,
+    "Hidden chain of thought summary"
+  );
+});
+
+test("sanitizeOpenAIResponse derives completion_tokens_details from reasoning_tokens", () => {
+  const sanitized = sanitizeOpenAIResponse({
+    model: "melma-zen",
+    choices: [],
+    usage: {
+      prompt_tokens: 30,
+      completion_tokens: 7,
+      total_tokens: 37,
+      reasoning_tokens: 4,
+    },
+  });
+
+  assert.equal((sanitized as any).usage.reasoning_tokens, 4);
+  assert.deepEqual((sanitized as any).usage.completion_tokens_details, {
+    reasoning_tokens: 4,
+  });
+});
+
+test("sanitizeOpenAIResponse preserves reasoning_details-derived reasoning_content when visible text exists", () => {
   const sanitized = sanitizeOpenAIResponse({
     model: "openrouter/model",
     choices: [
@@ -148,7 +188,7 @@ test("sanitizeOpenAIResponse strips reasoning_details-derived reasoning_content 
     ],
   });
 
-  assert.equal((sanitized as any).choices[0].message.reasoning_content, undefined);
+  assert.equal((sanitized as any).choices[0].message.reasoning_content, "first second");
 });
 
 test("sanitizeOpenAIResponse keeps reasoning_details-derived reasoning_content for reasoning-only messages", () => {
@@ -332,11 +372,25 @@ test("sanitizeStreamingChunk preserves reasoning usage + reasoning summary", () 
     completion_tokens: 20,
     total_tokens: 140,
     reasoning_tokens: 9,
+    completion_tokens_details: { reasoning_tokens: 9 },
   });
   assert.deepEqual((sanitized as any).reasoning_summary, {
     content: null,
     status: "unavailable",
   });
+});
+
+test("sanitizeStreamingChunk mirrors reasoning_summary into delta.reasoning_content fallback", () => {
+  const sanitized = sanitizeStreamingChunk({
+    id: "chunk_summary_only",
+    object: "chat.completion.chunk",
+    created: 1000,
+    model: "melma-zen",
+    choices: [{ index: 0, delta: {}, finish_reason: null }],
+    reasoning_summary: { content: "Reasoning summary text", status: "available" },
+  });
+
+  assert.equal((sanitized as any).choices[0].delta.reasoning_content, "Reasoning summary text");
 });
 
 test("sanitizeStreamingChunk converts reasoning_details arrays in deltas", () => {

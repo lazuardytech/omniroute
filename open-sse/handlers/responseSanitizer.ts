@@ -41,6 +41,19 @@ function toNumber(value: unknown): number | undefined {
   return typeof value === "number" && Number.isFinite(value) ? value : undefined;
 }
 
+function extractReasoningSummaryText(value: unknown): string | null {
+  const summary = toRecord(value);
+  if (!summary) return null;
+
+  const direct = typeof summary.content === "string" ? summary.content.trim() : "";
+  if (direct.length > 0) return direct;
+
+  const nested = toRecord(summary.summary);
+  if (!nested) return null;
+  const nestedContent = typeof nested.content === "string" ? nested.content.trim() : "";
+  return nestedContent.length > 0 ? nestedContent : null;
+}
+
 // Matches <think>...</think> blocks and <thinking>...</thinking> (greedy, dotAll)
 const THINK_TAG_REGEX = /<(?:think|thinking)>([\s\S]*?)<\/(?:think|thinking)>/gi;
 
@@ -123,6 +136,20 @@ export function sanitizeOpenAIResponse(body: unknown): unknown {
   // This is consumed by clients that render a separate thinking panel.
   if (bodyRecord.reasoning_summary !== undefined) {
     sanitized.reasoning_summary = bodyRecord.reasoning_summary;
+  }
+
+  // Compatibility fallback: some upstreams only send reasoning_summary without
+  // message.reasoning_content. Mirror summary text into the first assistant
+  // message so OpenAI-compatible clients can render a thinking panel.
+  const summaryText = extractReasoningSummaryText(bodyRecord.reasoning_summary);
+  if (summaryText && Array.isArray(sanitized.choices) && sanitized.choices.length > 0) {
+    const firstChoice = toRecord(sanitized.choices[0]);
+    const firstMessage = toRecord(firstChoice?.message);
+    if (firstChoice && firstMessage && typeof firstMessage.reasoning_content !== "string") {
+      firstMessage.reasoning_content = summaryText;
+      firstChoice.message = firstMessage;
+      sanitized.choices[0] = firstChoice;
+    }
   }
 
   return sanitized;
@@ -321,6 +348,14 @@ function sanitizeUsage(usage: unknown): unknown {
     toRecord(usageRecord.output_tokens_details)?.reasoning_tokens;
   if (sanitized.reasoning_tokens === undefined && detailReasoningTokens !== undefined) {
     sanitized.reasoning_tokens = detailReasoningTokens;
+  }
+  if (
+    sanitized.reasoning_tokens !== undefined &&
+    sanitized.completion_tokens_details === undefined
+  ) {
+    sanitized.completion_tokens_details = {
+      reasoning_tokens: sanitized.reasoning_tokens,
+    };
   }
 
   // Ensure required fields
@@ -747,6 +782,20 @@ export function sanitizeStreamingChunk(parsed: unknown): unknown {
   // Preserve optional reasoning summary envelope when present.
   if (parsedRecord.reasoning_summary !== undefined) {
     sanitized.reasoning_summary = parsedRecord.reasoning_summary;
+  }
+
+  // Compatibility fallback for streaming chunks:
+  // when upstream only sends summary text in reasoning_summary, mirror it into
+  // delta.reasoning_content so clients can surface thinking output.
+  const summaryText = extractReasoningSummaryText(parsedRecord.reasoning_summary);
+  if (summaryText && Array.isArray(sanitized.choices) && sanitized.choices.length > 0) {
+    const firstChoice = toRecord(sanitized.choices[0]);
+    const delta = toRecord(firstChoice?.delta);
+    if (firstChoice && delta && typeof delta.reasoning_content !== "string") {
+      delta.reasoning_content = summaryText;
+      firstChoice.delta = delta;
+      sanitized.choices[0] = firstChoice;
+    }
   }
 
   return sanitized;
