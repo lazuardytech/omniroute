@@ -26,7 +26,7 @@ jobs:
     name: Build and Push Docker (multi-arch)
     runs-on: ubuntu-latest
     env:
-      IMAGE_NAME: diegosouzapw/omniroute
+      IMAGE_NAME: lazuardytech/omniroute
     steps:
       - name: Checkout
         uses: actions/checkout@v6
