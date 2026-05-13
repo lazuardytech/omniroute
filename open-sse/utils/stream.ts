@@ -1617,7 +1617,7 @@ export function createSSEStream(options: StreamOptions = {}) {
                 const u = usage as Record<string, unknown> | null;
                 const prompt = Number(u?.prompt_tokens ?? u?.input_tokens ?? 0);
                 const completion = Number(u?.completion_tokens ?? u?.output_tokens ?? 0);
-                const reasoning = Number(
+                const reasoningTokens = Number(
                   u?.reasoning_tokens ??
                     (u?.completion_tokens_details as Record<string, unknown> | undefined)
                       ?.reasoning_tokens ??
@@ -1653,10 +1653,11 @@ export function createSSEStream(options: StreamOptions = {}) {
                   },
                   _streamed: true,
                 };
-                if (reasoning > 0) {
-                  (responseBody.usage as Record<string, unknown>).reasoning_tokens = reasoning;
+                if (reasoningTokens > 0) {
+                  (responseBody.usage as Record<string, unknown>).reasoning_tokens =
+                    reasoningTokens;
                   (responseBody.usage as Record<string, unknown>).completion_tokens_details = {
-                    reasoning_tokens: reasoning,
+                    reasoning_tokens: reasoningTokens,
                   };
                 }
                 onComplete({
