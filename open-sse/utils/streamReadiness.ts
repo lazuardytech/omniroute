@@ -35,6 +35,8 @@ function hasUsefulValue(value: unknown): boolean {
     "error",
     "executableCode",
     "codeExecutionResult",
+    "finish_reason",  // Fix A: OpenAI finish_reason signals a completed stream
+    "stop_reason",   // Fix B: Anthropic stop_reason signals a completed stream
   ]) {
     const candidate = value[key];
     if (hasNonEmptyString(candidate)) return true;
@@ -54,6 +56,7 @@ function hasUsefulValue(value: unknown): boolean {
     "choices",
     "candidates",
     "parts",
+    "message",  // Fix B: Anthropic message_start wraps the message object
   ]) {
     if (hasUsefulValue(value[key])) return true;
   }
@@ -174,6 +177,14 @@ export async function ensureStreamReadiness(
   const startedAt = Date.now();
   const deadline = startedAt + options.timeoutMs;
   let handedOffReader = false;
+  let sawAnyDataLine = false;
+
+  function checkAnyDataLine(text: string): boolean {
+    return text.split(/\r?\n/).some((line) => {
+      const t = line.trim();
+      return t.startsWith("data:") && t.slice(5).trim() !== "[DONE]" && t.slice(5).trim() !== "";
+    });
+  }
 
   try {
     while (true) {
@@ -224,6 +235,23 @@ export async function ensureStreamReadiness(
       }
 
       if (readResult.done) {
+        // Fix C: distinguish clean EOF (valid SSE frames sent, just no text content)
+        // from true early EOF (connection dropped with zero data lines).
+        if (sawAnyDataLine) {
+          options.log?.debug?.(
+            "STREAM",
+            `Stream completed with valid SSE but no text content (${options.provider || "provider"}/${options.model || "unknown"})`
+          );
+          handedOffReader = true;
+          return {
+            ok: true,
+            response: new Response(prependBufferedChunks(chunks, reader), {
+              status: response.status,
+              statusText: response.statusText,
+              headers: response.headers,
+            }),
+          };
+        }
         const reason = "Stream ended before producing useful content";
         options.log?.warn?.(
           "STREAM",
@@ -246,6 +274,10 @@ export async function ensureStreamReadiness(
       if (!readResult.value) continue;
       chunks.push(readResult.value);
       bufferedText += decoder.decode(readResult.value, { stream: true });
+
+      if (!sawAnyDataLine) {
+        sawAnyDataLine = checkAnyDataLine(bufferedText);
+      }
 
       if (hasUsefulStreamContent(bufferedText)) {
         options.log?.debug?.(
