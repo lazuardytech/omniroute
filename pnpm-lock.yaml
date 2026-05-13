@@ -122,6 +122,9 @@ importers:
       selfsigned:
         specifier: ^5.5.0
         version: 5.5.0
+      split2:
+        specifier: ^4.2.0
+        version: 4.2.0
       tls-client-node:
         specifier: ^0.1.13
         version: 0.1.13
