@@ -369,7 +369,8 @@ export function extractUsage(chunk) {
         chunk.usage.prompt_cache_hit_tokens,
       reasoning_tokens:
         chunk.usage.completion_tokens_details?.reasoning_tokens ??
-        chunk.usage.output_tokens_details?.reasoning_tokens,
+        chunk.usage.output_tokens_details?.reasoning_tokens ??
+        chunk.usage.reasoning_tokens,
     });
   }
 

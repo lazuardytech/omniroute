@@ -13,6 +13,7 @@ const ALLOWED_USAGE_FIELDS = new Set([
   "prompt_tokens",
   "completion_tokens",
   "total_tokens",
+  "reasoning_tokens",
   "prompt_tokens_details",
   "completion_tokens_details",
 ]);
@@ -116,6 +117,12 @@ export function sanitizeOpenAIResponse(body: unknown): unknown {
   // Keep system_fingerprint if present (it's a valid OpenAI field)
   if (bodyRecord.system_fingerprint) {
     sanitized.system_fingerprint = bodyRecord.system_fingerprint;
+  }
+
+  // Preserve optional reasoning summary envelope when upstream provides it.
+  // This is consumed by clients that render a separate thinking panel.
+  if (bodyRecord.reasoning_summary !== undefined) {
+    sanitized.reasoning_summary = bodyRecord.reasoning_summary;
   }
 
   return sanitized;
@@ -304,6 +311,16 @@ function sanitizeUsage(usage: unknown): unknown {
     if (usageRecord[key] !== undefined) {
       sanitized[key] = usageRecord[key];
     }
+  }
+
+  // Prefer explicit top-level reasoning_tokens when present.
+  // If absent, derive from details for compatibility with clients that only
+  // inspect usage.reasoning_tokens (common in OpenAI-compatible ecosystems).
+  const detailReasoningTokens =
+    toRecord(usageRecord.completion_tokens_details)?.reasoning_tokens ??
+    toRecord(usageRecord.output_tokens_details)?.reasoning_tokens;
+  if (sanitized.reasoning_tokens === undefined && detailReasoningTokens !== undefined) {
+    sanitized.reasoning_tokens = detailReasoningTokens;
   }
 
   // Ensure required fields
@@ -725,6 +742,11 @@ export function sanitizeStreamingChunk(parsed: unknown): unknown {
   // Keep system_fingerprint if present
   if (parsedRecord.system_fingerprint) {
     sanitized.system_fingerprint = parsedRecord.system_fingerprint;
+  }
+
+  // Preserve optional reasoning summary envelope when present.
+  if (parsedRecord.reasoning_summary !== undefined) {
+    sanitized.reasoning_summary = parsedRecord.reasoning_summary;
   }
 
   return sanitized;

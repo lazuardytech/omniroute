@@ -28,7 +28,8 @@ export function extractUsageFromResponse(responseBody, provider) {
         responseBody.usage.prompt_cache_hit_tokens,
       reasoning_tokens:
         responseBody.usage.completion_tokens_details?.reasoning_tokens ??
-        responseBody.usage.output_tokens_details?.reasoning_tokens,
+        responseBody.usage.output_tokens_details?.reasoning_tokens ??
+        responseBody.usage.reasoning_tokens,
     };
   }
 

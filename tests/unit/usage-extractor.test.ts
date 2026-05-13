@@ -62,6 +62,26 @@ test("extractUsageFromResponse defaults missing OpenAI token fields to zero", ()
   assert.equal(usage.reasoning_tokens, undefined);
 });
 
+test("extractUsageFromResponse reads flat OpenAI reasoning_tokens fallback", () => {
+  const usage = extractUsageFromResponse(
+    {
+      usage: {
+        prompt_tokens: 40,
+        completion_tokens: 10,
+        reasoning_tokens: 6,
+      },
+    },
+    "openai"
+  );
+
+  assert.deepEqual(usage, {
+    prompt_tokens: 40,
+    completion_tokens: 10,
+    cached_tokens: undefined,
+    reasoning_tokens: 6,
+  });
+});
+
 test("extractUsageFromResponse reads Responses API usage from the top-level usage field", () => {
   const usage = extractUsageFromResponse(
     {
@@ -291,4 +311,19 @@ test("extractUsage reads OpenAI streaming chunk with prompt_tokens_details", () 
 
   assert.equal(usage.cached_tokens, 50);
   assert.equal(usage.reasoning_tokens, 20);
+});
+
+test("extractUsage reads OpenAI streaming chunk with flat reasoning_tokens fallback", () => {
+  const usage = extractUsage({
+    choices: [{ delta: {}, finish_reason: "stop" }],
+    usage: {
+      prompt_tokens: 80,
+      completion_tokens: 12,
+      reasoning_tokens: 5,
+    },
+  });
+
+  assert.equal(usage.prompt_tokens, 80);
+  assert.equal(usage.completion_tokens, 12);
+  assert.equal(usage.reasoning_tokens, 5);
 });

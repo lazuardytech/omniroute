@@ -100,6 +100,36 @@ test("sanitizeOpenAIResponse maps Claude-style usage fields and strips extras", 
   });
 });
 
+test("sanitizeOpenAIResponse preserves reasoning token metadata and reasoning summary envelope", () => {
+  const sanitized = sanitizeOpenAIResponse({
+    id: "chatcmpl_reasoning",
+    model: "melma-zen",
+    choices: [],
+    usage: {
+      prompt_tokens: 120,
+      completion_tokens: 32,
+      total_tokens: 152,
+      reasoning_tokens: 11,
+      completion_tokens_details: { reasoning_tokens: 11 },
+    },
+    reasoning_summary: { content: "internal summary", status: "available" },
+    warning: null,
+  });
+
+  assert.deepEqual((sanitized as any).usage, {
+    prompt_tokens: 120,
+    completion_tokens: 32,
+    total_tokens: 152,
+    reasoning_tokens: 11,
+    completion_tokens_details: { reasoning_tokens: 11 },
+  });
+  assert.deepEqual((sanitized as any).reasoning_summary, {
+    content: "internal summary",
+    status: "available",
+  });
+  assert.equal((sanitized as any).warning, undefined);
+});
+
 test("sanitizeOpenAIResponse strips reasoning_details-derived reasoning_content when visible text exists", () => {
   const sanitized = sanitizeOpenAIResponse({
     model: "openrouter/model",
@@ -278,6 +308,34 @@ test("sanitizeStreamingChunk keeps only safe chunk fields and maps reasoning ali
       total_tokens: 3,
     },
     system_fingerprint: "fp_123",
+  });
+});
+
+test("sanitizeStreamingChunk preserves reasoning usage + reasoning summary", () => {
+  const sanitized = sanitizeStreamingChunk({
+    id: "chunk_reasoning",
+    object: "chat.completion.chunk",
+    created: 999,
+    model: "melma-zen",
+    choices: [{ index: 0, delta: {}, finish_reason: "stop" }],
+    usage: {
+      prompt_tokens: 120,
+      completion_tokens: 20,
+      total_tokens: 140,
+      reasoning_tokens: 9,
+    },
+    reasoning_summary: { content: null, status: "unavailable" },
+  });
+
+  assert.deepEqual((sanitized as any).usage, {
+    prompt_tokens: 120,
+    completion_tokens: 20,
+    total_tokens: 140,
+    reasoning_tokens: 9,
+  });
+  assert.deepEqual((sanitized as any).reasoning_summary, {
+    content: null,
+    status: "unavailable",
   });
 });
 
