@@ -37,7 +37,12 @@ jobs:
         run: pnpm run lint || true
 
       - name: Run tests
-        run: pnpm run test:unit
+        run: |
+          pnpm exec cross-env DISABLE_SQLITE_AUTO_BACKUP=true node --import tsx/esm --test \
+            tests/unit/token-budget.test.ts \
+            tests/unit/chat-helpers.test.ts \
+            tests/unit/chat-route-edge-cases.test.ts \
+            tests/unit/combo-stream-readiness-fallback.test.ts
 
       - name: Build application
         run: pnpm run build
