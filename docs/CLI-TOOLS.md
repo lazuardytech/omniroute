@@ -80,19 +80,19 @@ All npm-based tools require Node.js 18+:
 
 ```bash
 # Claude Code (Anthropic)
-npm install -g @anthropic-ai/claude-code
+pnpm install -g @anthropic-ai/claude-code
 
 # OpenAI Codex
-npm install -g @openai/codex
+pnpm install -g @openai/codex
 
 # OpenCode
-npm install -g opencode-ai
+pnpm install -g opencode-ai
 
 # Cline
-npm install -g cline
+pnpm install -g cline
 
 # KiloCode
-npm install -g kilocode
+pnpm install -g kilocode
 
 # Kiro CLI (Amazon — requires curl + unzip)
 apt-get install -y unzip   # on Debian/Ubuntu
@@ -374,7 +374,7 @@ OMNIROUTE_URL="http://localhost:20128/v1"
 OMNIROUTE_ANTHROPIC_URL="http://localhost:20128"
 OMNIROUTE_KEY="sk-your-omniroute-key"
 
-npm install -g @anthropic-ai/claude-code @openai/codex opencode-ai cline kilocode @qwen-code/qwen-code
+pnpm install -g @anthropic-ai/claude-code @openai/codex opencode-ai cline kilocode @qwen-code/qwen-code
 
 # Kiro CLI
 apt-get install -y unzip 2>/dev/null; curl -fsSL https://cli.kiro.dev/install | bash

@@ -5,15 +5,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Quick Start
 
 ```bash
-npm install                    # Install deps (auto-generates .env from .env.example)
-npm run dev                    # Dev server at http://localhost:20128
-npm run build                  # Production build (Next.js 16 standalone)
-npm run lint                   # ESLint (0 errors expected; warnings are pre-existing)
-npm run typecheck:core         # TypeScript check (should be clean)
-npm run typecheck:noimplicit:core  # Strict check (no implicit any)
-npm run test:coverage          # Unit tests + coverage gate (60% min)
-npm run check                  # lint + test combined
-npm run check:cycles           # Detect circular dependencies
+ppnpm install                    # Install deps (auto-generates .env from .env.example)
+ppnpm run dev                    # Dev server at http://localhost:20128
+ppnpm run build                  # Production build (Next.js 16 standalone)
+ppnpm run lint                   # ESLint (0 errors expected; warnings are pre-existing)
+ppnpm run typecheck:core         # TypeScript check (should be clean)
+ppnpm run typecheck:noimplicit:core  # Strict check (no implicit any)
+ppnpm run test:coverage          # Unit tests + coverage gate (60% min)
+ppnpm run check                  # lint + test combined
+ppnpm run check:cycles           # Detect circular dependencies
 ```
 
 ### Running Tests
@@ -23,10 +23,10 @@ npm run check:cycles           # Detect circular dependencies
 node --import tsx/esm --test tests/unit/your-file.test.ts
 
 # Vitest (MCP server, autoCombo, cache)
-npm run test:vitest
+ppnpm run test:vitest
 
 # All suites
-npm run test:all
+ppnpm run test:all
 ```
 
 For full test matrix, see `CONTRIBUTING.md` → "Running Tests". For deep architecture, see `AGENTS.md`.
@@ -291,14 +291,14 @@ connection continue serving other models.
 
 | What                    | Command                                                |
 | ----------------------- | ------------------------------------------------------ |
-| Unit tests              | `npm run test:unit`                                    |
+| Unit tests              | `ppnpm run test:unit`                                    |
 | Single file             | `node --import tsx/esm --test tests/unit/file.test.ts` |
-| Vitest (MCP, autoCombo) | `npm run test:vitest`                                  |
-| E2E (Playwright)        | `npm run test:e2e`                                     |
-| Protocol E2E (MCP+A2A)  | `npm run test:protocols:e2e`                           |
-| Ecosystem               | `npm run test:ecosystem`                               |
-| Coverage gate           | `npm run test:coverage` (60% min all metrics)          |
-| Coverage report         | `npm run coverage:report`                              |
+| Vitest (MCP, autoCombo) | `ppnpm run test:vitest`                                  |
+| E2E (Playwright)        | `ppnpm run test:e2e`                                     |
+| Protocol E2E (MCP+A2A)  | `ppnpm run test:protocols:e2e`                           |
+| Ecosystem               | `ppnpm run test:ecosystem`                               |
+| Coverage gate           | `ppnpm run test:coverage` (60% min all metrics)          |
+| Coverage report         | `ppnpm run coverage:report`                              |
 
 **PR rule**: If you change production code in `src/`, `open-sse/`, `electron/`, or `bin/`, you must include or update tests in the same PR.
 
@@ -324,7 +324,7 @@ git push -u origin feat/your-feature
 **Husky hooks**:
 
 - **pre-commit**: lint-staged + `check-docs-sync` + `check:any-budget:t11`
-- **pre-push**: `npm run test:unit`
+- **pre-push**: `ppnpm run test:unit`
 
 ---
 

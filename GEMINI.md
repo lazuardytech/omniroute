@@ -8,7 +8,7 @@
 **The Project Root MUST ONLY CONTAIN:**
 
 - Configuration files (`vitest.config.ts`, `next.config.mjs`, `eslint.config.mjs`, etc.)
-- Dependency files (`package.json`, `package-lock.json`)
+- Dependency files (`package.json`, `pnpm-lock.yaml`)
 - Documentation files (`README.md`, `CHANGELOG.md`, `AGENTS.md`)
 - CI/CD files and ignore definitions (`.gitignore`, `.dockerignore`)
 

@@ -60,7 +60,7 @@ body:
       placeholder: |
         Example:
         - node --import tsx/esm --test tests/unit/my-suite.test.ts
-        - npm run test:coverage
+        - pnpm run test:coverage
     validations:
       required: true
 

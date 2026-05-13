@@ -8,7 +8,7 @@ There are multiple coverage numbers depending on how the report is computed. For
 
 | Metric               | Scope                                                 | Statements / Lines | Branches | Functions | Notes                                               |
 | -------------------- | ----------------------------------------------------- | -----------------: | -------: | --------: | --------------------------------------------------- |
-| Legacy               | Old `npm run test:coverage`                           |             79.42% |   75.15% |    67.94% | Inflated: counts test files and excludes `open-sse` |
+| Legacy               | Old `pnpm run test:coverage`                           |             79.42% |   75.15% |    67.94% | Inflated: counts test files and excludes `open-sse` |
 | Diagnostic           | Source-only, excluding tests and excluding `open-sse` |             68.16% |   63.55% |    64.06% | Useful only to isolate `src/**`                     |
 | Recommended baseline | Source-only, excluding tests and including `open-sse` |             56.95% |   66.05% |    57.80% | This is the project-wide baseline to improve        |
 
@@ -24,12 +24,12 @@ The recommended baseline is the number to optimize against.
 
 ## Current command set
 
-- `npm run test:coverage`
+- `pnpm run test:coverage`
   - Main source coverage gate for the unit test suite
   - Generates `text-summary`, `html`, `json-summary`, and `lcov`
-- `npm run coverage:report`
+- `pnpm run coverage:report`
   - Detailed file-by-file report from the latest run
-- `npm run test:coverage:legacy`
+- `pnpm run test:coverage:legacy`
   - Historical comparison only
 
 ## Milestones
@@ -146,7 +146,7 @@ These files or areas offer the best return for the next phases:
 
 ## Ratchet policy
 
-Update `npm run test:coverage` thresholds only after the project actually exceeds the next milestone with a comfortable buffer.
+Update `pnpm run test:coverage` thresholds only after the project actually exceeds the next milestone with a comfortable buffer.
 
 Recommended ratchet sequence:
 

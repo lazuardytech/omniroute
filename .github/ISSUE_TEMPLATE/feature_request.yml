@@ -91,6 +91,6 @@ body:
         Example:
         - Add unit tests for open-sse/services/combo.ts
         - Extend integration coverage for /api/v1/models
-        - Keep npm run test:coverage at 60%+
+        - Keep pnpm run test:coverage at 60%+
     validations:
       required: false

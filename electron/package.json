@@ -3,6 +3,7 @@
   "version": "3.8.0",
   "description": "OmniRoute Desktop Application",
   "main": "main.js",
+  "packageManager": "pnpm@10.33.4",
   "author": {
     "name": "OmniRoute Team",
     "email": "support@omniroute.online"
@@ -13,13 +14,13 @@
     "start": "electron .",
     "dev": "electron . --no-sandbox",
     "prepare:bundle": "node ../scripts/prepare-electron-standalone.mjs",
-    "build": "npm run prepare:bundle && electron-builder",
-    "build:win": "npm run prepare:bundle && electron-builder --win",
-    "build:mac": "npm run prepare:bundle && electron-builder --mac",
-    "build:mac-x64": "npm run prepare:bundle && electron-builder --mac --x64",
-    "build:mac-arm64": "npm run prepare:bundle && electron-builder --mac --arm64",
-    "build:linux": "npm run prepare:bundle && electron-builder --linux",
-    "pack": "npm run prepare:bundle && electron-builder --dir"
+    "build": "pnpm run prepare:bundle && electron-builder",
+    "build:win": "pnpm run prepare:bundle && electron-builder --win",
+    "build:mac": "pnpm run prepare:bundle && electron-builder --mac",
+    "build:mac-x64": "pnpm run prepare:bundle && electron-builder --mac --x64",
+    "build:mac-arm64": "pnpm run prepare:bundle && electron-builder --mac --arm64",
+    "build:linux": "pnpm run prepare:bundle && electron-builder --linux",
+    "pack": "pnpm run prepare:bundle && electron-builder --dir"
   },
   "dependencies": {
     "better-sqlite3": "^12.9.0",

@@ -34,7 +34,7 @@ _The most complete open-source AI proxy — **one endpoint**, **160+ providers**
 
 <div align="center">
 
-[![npm version](https://img.shields.io/npm/v/omniroute?color=cb3837&logo=npm)](https://www.npmjs.com/package/omniroute)
+[![package version](https://img.shields.io/npm/v/omniroute?color=cb3837&logo=npm)](https://www.npmjs.com/package/omniroute)
 ![NPM Weekly](https://img.shields.io/npm/dw/omniroute?label=npm/week&color=cb3837&logo=npm)
 ![NPM Monthly](https://img.shields.io/npm/dm/omniroute?label=npm/month&color=cb3837&logo=npm)
 ![NPM Yearly](https://img.shields.io/npm/d18m/omniroute?label=npm/year&color=cb3837&logo=npm)
@@ -247,7 +247,7 @@ _Connect any AI-powered IDE or CLI tool through OmniRoute — free API gateway f
 When opening an issue, please run the system-info command and attach the generated file:
 
 ```bash
-npm run system-info
+ppnpm run system-info
 ```
 
 This generates a `system-info.txt` with your Node.js version, OmniRoute version, OS details, installed CLI tools (qoder, gemini, claude, codex, antigravity, droid, etc.), Docker/PM2 status, and system packages — everything we need to reproduce your issue quickly. Attach the file directly to your GitHub issue.
@@ -621,7 +621,7 @@ Compression combos can also assign a named compression pipeline to routing combo
 ### 1) Install and run
 
 ```bash
-npm install -g omniroute
+ppnpm install -g omniroute
 omniroute
 ```
 
@@ -655,11 +655,11 @@ docker run -d --name omniroute --restart unless-stopped -p 20128:20128 -v omniro
 **From source:**
 
 ```bash
-cp .env.example .env && npm install
-PORT=20128 DASHBOARD_PORT=20129 NEXT_PUBLIC_BASE_URL=http://localhost:20129 npm run dev
+cp .env.example .env && ppnpm install
+PORT=20128 DASHBOARD_PORT=20129 NEXT_PUBLIC_BASE_URL=http://localhost:20129 ppnpm run dev
 ```
 
-**pnpm:** `pnpm install -g omniroute && pnpm approve-builds -g && omniroute`
+**pnpm:** `ppnpm install -g omniroute && pnpm approve-builds -g && omniroute`
 
 **Arch Linux (AUR):** `yay -S omniroute-bin && systemctl --user enable --now omniroute.service`
 
@@ -669,7 +669,7 @@ PORT=20128 DASHBOARD_PORT=20129 NEXT_PUBLIC_BASE_URL=http://localhost:20129 npm 
 
 **Split-port mode:** `PORT=20128 DASHBOARD_PORT=20129 omniroute`
 
-**Uninstall:** `npm run uninstall` (keeps data) or `npm run uninstall:full` (removes everything)
+**Uninstall:** `ppnpm run uninstall` (keeps data) or `ppnpm run uninstall:full` (removes everything)
 
 📖 Full details: [Setup Guide](#-setup-guide) · [Docker](#-docker) · [Void Linux template](#-quick-start)
 
@@ -776,8 +776,8 @@ volumes:
 
 | Platform       | Install                                      | Highlights                                                                 |
 | -------------- | -------------------------------------------- | -------------------------------------------------------------------------- |
-| 🖥️ **Desktop** | `npm run electron:build`                     | Native window, system tray, auto-start, offline mode — Windows/macOS/Linux |
-| 📱 **Android** | `pkg install nodejs-lts && npx -y omniroute` | ARM native, no root, 24/7 via Termux:Boot — your phone is an AI server     |
+| 🖥️ **Desktop** | `ppnpm run electron:build`                     | Native window, system tray, auto-start, offline mode — Windows/macOS/Linux |
+| 📱 **Android** | `pkg install nodejs-lts && pnpm exec -y omniroute` | ARM native, no root, 24/7 via Termux:Boot — your phone is an AI server     |
 | 📲 **PWA**     | "Add to Home Screen" in browser              | Fullscreen, offline page, service worker caching — Android/iOS/Desktop     |
 
 <details>
@@ -785,7 +785,7 @@ volumes:
 
 - Native Electron app with system tray, auto-start, native notifications
 - One-click install: NSIS (Windows), DMG (macOS), AppImage (Linux)
-- Dev: `npm run electron:dev` · Build: `npm run electron:build`
+- Dev: `ppnpm run electron:dev` · Build: `ppnpm run electron:build`
 - 📖 Full docs: [`electron/README.md`](electron/README.md)
 
 </details>
@@ -795,7 +795,7 @@ volumes:
 
 ```bash
 pkg update && pkg install nodejs-lts python build-essential git
-npx -y omniroute@latest
+pnpm exec -y omniroute@latest
 ```
 
 Access from any device on the same network: `http://PHONE_IP:20128/v1`
@@ -1307,7 +1307,7 @@ See the [Proxy Guide](docs/PROXY_GUIDE.md) for setup instructions.
 | **`unsupported_country_region_territory`**    | Configure proxy in Settings → Proxy (see [Proxy Guide](docs/PROXY_GUIDE.md))         |
 | **Docker SQLite locks**                       | Use `--stop-timeout 40` for clean WAL checkpoint on shutdown                         |
 | **Node.js runtime errors**                    | Use Node.js `>=20.20.2 <21`, `>=22.22.2 <23`, or `>=24.0.0 <25` (24 LTS recommended) |
-| **`system-info` for bug reports**             | Run `npm run system-info` and attach `system-info.txt` to your issue                 |
+| **`system-info` for bug reports**             | Run `ppnpm run system-info` and attach `system-info.txt` to your issue                 |
 
 📖 **Full troubleshooting guide:** [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md)
 
@@ -1326,7 +1326,7 @@ See the [Proxy Guide](docs/PROXY_GUIDE.md) for setup instructions.
 - **Auth**: OAuth 2.0 (PKCE) + JWT + API Keys + MCP Scoped Authorization
 - **Testing**: Node.js test runner + Vitest (**4,690+ test cases** across 517 files — unit, integration, E2E, security, ecosystem)
 - **Platforms**: Desktop (Electron), Android (Termux), PWA (any browser)
-- **CI/CD**: GitHub Actions (auto npm publish + Docker Hub on release)
+- **CI/CD**: GitHub Actions (auto package publish + Docker Hub on release)
 - **Website**: [omniroute.online](https://omniroute.online)
 - **Package**: [npmjs.com/package/omniroute](https://www.npmjs.com/package/omniroute)
 - **Docker**: [hub.docker.com/r/diegosouzapw/omniroute](https://hub.docker.com/r/diegosouzapw/omniroute)
@@ -1469,7 +1469,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 ### Releasing a New Version
 
 ```bash
-# Create a release — npm publish happens automatically
+# Create a release — package publish happens automatically
 gh release create v2.0.0 --title "v2.0.0" --generate-notes
 ```
 

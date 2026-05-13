@@ -13,7 +13,7 @@ OmniRoute provides two built-in scripts for clean removal:
 ### Keep Your Data
 
 ```bash
-npm run uninstall
+pnpm run uninstall
 ```
 
 This removes the OmniRoute application but **preserves** your database, configurations, API keys, and provider settings in `~/.omniroute/`. Use this if you plan to reinstall later and want to keep your setup.
@@ -21,7 +21,7 @@ This removes the OmniRoute application but **preserves** your database, configur
 ### Full Removal
 
 ```bash
-npm run uninstall:full
+pnpm run uninstall:full
 ```
 
 This removes the application **and permanently erases** all data:
@@ -32,7 +32,7 @@ This removes the application **and permanently erases** all data:
 - Log files
 - All files in the `~/.omniroute/` directory
 
-> ⚠️ **Warning:** `npm run uninstall:full` is irreversible. All your provider connections, combos, API keys, and usage history will be permanently deleted.
+> ⚠️ **Warning:** `pnpm run uninstall:full` is irreversible. All your provider connections, combos, API keys, and usage history will be permanently deleted.
 
 ---
 

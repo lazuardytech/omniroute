@@ -17,7 +17,7 @@ Thank you for your interest in contributing! This guide covers everything you ne
 ```bash
 git clone https://github.com/diegosouzapw/OmniRoute.git
 cd OmniRoute
-npm install
+pnpm install
 ```
 
 ### Environment Variables
@@ -56,14 +56,14 @@ These settings are stored in the database and persist across restarts, overridin
 
 ```bash
 # Development mode (hot reload)
-npm run dev
+pnpm run dev
 
 # Production build
-npm run build
-npm run start
+pnpm run build
+pnpm run start
 
 # Common port configuration
-PORT=20128 NEXT_PUBLIC_BASE_URL=http://localhost:20128 npm run dev
+PORT=20128 NEXT_PUBLIC_BASE_URL=http://localhost:20128 pnpm run dev
 ```
 
 Default URLs:
@@ -116,47 +116,47 @@ Scopes: `db`, `sse`, `oauth`, `dashboard`, `api`, `cli`, `docker`, `ci`, `mcp`, 
 
 ```bash
 # All tests (unit + vitest + ecosystem + e2e)
-npm run test:all
+pnpm run test:all
 
 # Single test file (Node.js native test runner — most tests use this)
 node --import tsx/esm --test tests/unit/your-file.test.ts
 
 # Vitest (MCP server, autoCombo, cache)
-npm run test:vitest
+pnpm run test:vitest
 
 # E2E tests (requires Playwright)
-npm run test:e2e
+pnpm run test:e2e
 
 # Protocol clients E2E (MCP transports, A2A)
-npm run test:protocols:e2e
+pnpm run test:protocols:e2e
 
 # Ecosystem compatibility tests
-npm run test:ecosystem
+pnpm run test:ecosystem
 
 # Coverage (60% min statements/lines/functions/branches)
-npm run test:coverage
-npm run coverage:report
+pnpm run test:coverage
+pnpm run coverage:report
 
 # Lint + format check
-npm run lint
-npm run check
+pnpm run lint
+pnpm run check
 ```
 
 Coverage notes:
 
-- `npm run test:coverage` measures source coverage for the main unit test suite, excludes `tests/**`, and includes `open-sse/**`
+- `pnpm run test:coverage` measures source coverage for the main unit test suite, excludes `tests/**`, and includes `open-sse/**`
 - Pull requests must keep the overall coverage gate at **60% or higher** for statements, lines, functions, and branches
 - If a PR changes production code in `src/`, `open-sse/`, `electron/`, or `bin/`, it must add or update automated tests in the same PR
-- `npm run coverage:report` prints the detailed file-by-file report from the latest coverage run
-- `npm run test:coverage:legacy` preserves the older metric for historical comparison
+- `pnpm run coverage:report` prints the detailed file-by-file report from the latest coverage run
+- `pnpm run test:coverage:legacy` preserves the older metric for historical comparison
 - See `docs/COVERAGE_PLAN.md` for the phased coverage improvement roadmap
 
 ### Pull Request Requirements
 
 Before opening or merging a PR:
 
-- Run `npm run test:unit`
-- Run `npm run test:coverage`
+- Run `pnpm run test:unit`
+- Run `pnpm run test:coverage`
 - Ensure the coverage gate stays at **60%+** for all metrics
 - Include the changed or added test files in the PR description when production code changed
 - Check the SonarQube result on the PR when the project secrets are configured in CI
@@ -176,7 +176,7 @@ Current test status: **122 unit test files** covering:
 
 ## Code Style
 
-- **ESLint** — Run `npm run lint` before committing
+- **ESLint** — Run `pnpm run lint` before committing
 - **Prettier** — Auto-formatted via `lint-staged` on commit (2 spaces, semicolons, double quotes, 100 char width, es5 trailing commas)
 - **TypeScript** — All `src/` code uses `.ts`/`.tsx`; `open-sse/` uses `.ts`/`.js`; document with TSDoc (`@param`, `@returns`, `@throws`)
 - **No `eval()`** — ESLint enforces `no-eval`, `no-implied-eval`, `no-new-func`
@@ -282,9 +282,9 @@ Write unit tests in `tests/unit/` covering at minimum:
 
 ## Pull Request Checklist
 
-- [ ] Tests pass (`npm test`)
-- [ ] Linting passes (`npm run lint`)
-- [ ] Build succeeds (`npm run build`)
+- [ ] Tests pass (`pnpm test`)
+- [ ] Linting passes (`pnpm run lint`)
+- [ ] Build succeeds (`pnpm run build`)
 - [ ] TypeScript types added for new public functions and interfaces
 - [ ] No hardcoded secrets or fallback values
 - [ ] All inputs validated with Zod schemas

@@ -168,7 +168,7 @@ docker run -d \
 
 ## Dependencies
 
-- Run `npm audit` regularly
+- Run `pnpm audit` regularly
 - Keep dependencies updated
 - The project uses `husky` + `lint-staged` for pre-commit checks
 - CI pipeline runs ESLint security rules on every push

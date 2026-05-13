@@ -9,9 +9,9 @@
 
 ## Validation
 
-- [ ] `npm run lint`
-- [ ] `npm run test:unit`
-- [ ] `npm run test:coverage`
+- [ ] `ppnpm run lint`
+- [ ] `ppnpm run test:unit`
+- [ ] `ppnpm run test:coverage`
 - [ ] Coverage is still `>= 60%` for statements, lines, functions, and branches
 - [ ] SonarQube PR analysis is green or any remaining issues are explicitly documented below
 

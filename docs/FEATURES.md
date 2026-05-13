@@ -170,8 +170,8 @@ Clean removal scripts for all installation methods:
 
 | Command                  | Action                                                                              |
 | ------------------------ | ----------------------------------------------------------------------------------- |
-| `npm run uninstall`      | Removes the system app but **keeps your DB and configurations** in `~/.omniroute`.  |
-| `npm run uninstall:full` | Removes the app AND permanently **erases all configurations, keys, and databases**. |
+| `pnpm run uninstall`      | Removes the system app but **keeps your DB and configurations** in `~/.omniroute`.  |
+| `pnpm run uninstall:full` | Removes the app AND permanently **erases all configurations, keys, and databases**. |
 
 ---
 

@@ -5,19 +5,16 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends libsecret-1-0 ca-certificates \
   && rm -rf /var/lib/apt/lists/*
 
-COPY package*.json ./
+COPY package.json pnpm-lock.yaml .npmrc ./
 COPY scripts/postinstall.mjs ./scripts/postinstall.mjs
 COPY scripts/postinstallSupport.mjs ./scripts/postinstallSupport.mjs
 COPY scripts/native-binary-compat.mjs ./scripts/native-binary-compat.mjs
-ENV NPM_CONFIG_LEGACY_PEER_DEPS=true
-RUN if [ -f package-lock.json ]; then \
-    npm ci --no-audit --no-fund --legacy-peer-deps; \
-    else \
-    npm install --no-audit --no-fund --legacy-peer-deps; \
-    fi
+RUN corepack enable && corepack prepare pnpm@10 --activate
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
+  pnpm install --frozen-lockfile
 
 COPY . ./
-RUN mkdir -p /app/data && npm run build -- --webpack
+RUN mkdir -p /app/data && pnpm run build -- --webpack
 
 FROM node:24.15.0-trixie-slim AS runner-base
 WORKDIR /app
@@ -32,6 +29,7 @@ ENV NODE_ENV=production
 ENV PORT=20128
 ENV HOSTNAME=0.0.0.0
 ENV NODE_OPTIONS="--max-old-space-size=256"
+ENV PNPM_HOME=/usr/local/bin
 
 # Data directory inside Docker — must match the volume mount in docker-compose.yml
 ENV DATA_DIR=/app/data
@@ -81,4 +79,5 @@ RUN apt-get update \
   && git config --system url."https://github.com/".insteadOf "ssh://git@github.com/"
 
 # Install CLI tools globally. Separate layer from apt for better cache reuse.
-RUN npm install -g --no-audit --no-fund @openai/codex @anthropic-ai/claude-code droid openclaw@latest
+RUN corepack enable && corepack prepare pnpm@10 --activate && \
+  pnpm add -g @openai/codex @anthropic-ai/claude-code droid openclaw@latest

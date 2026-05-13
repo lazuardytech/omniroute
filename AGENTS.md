@@ -25,23 +25,23 @@ with **MCP Server** (37 tools), **A2A v0.3 Protocol**, and **Electron desktop ap
 
 | Command                             | Description                       |
 | ----------------------------------- | --------------------------------- |
-| `npm run dev`                       | Start Next.js dev server          |
-| `npm run build`                     | Production build (isolated)       |
-| `npm run start`                     | Run production build              |
-| `npm run build:cli`                 | Build CLI package                 |
-| `npm run lint`                      | ESLint on all source files        |
-| `npm run typecheck:core`            | TypeScript core type checking     |
-| `npm run typecheck:noimplicit:core` | Strict checking (no implicit any) |
-| `npm run check`                     | Run lint + test                   |
-| `npm run check:cycles`              | Check for circular dependencies   |
-| `npm run electron:dev`              | Run Electron app in dev mode      |
-| `npm run electron:build`            | Build Electron app for current OS |
+| `ppnpm run dev`                       | Start Next.js dev server          |
+| `ppnpm run build`                     | Production build (isolated)       |
+| `ppnpm run start`                     | Run production build              |
+| `ppnpm run build:cli`                 | Build CLI package                 |
+| `ppnpm run lint`                      | ESLint on all source files        |
+| `ppnpm run typecheck:core`            | TypeScript core type checking     |
+| `ppnpm run typecheck:noimplicit:core` | Strict checking (no implicit any) |
+| `ppnpm run check`                     | Run lint + test                   |
+| `ppnpm run check:cycles`              | Check for circular dependencies   |
+| `ppnpm run electron:dev`              | Run Electron app in dev mode      |
+| `ppnpm run electron:build`            | Build Electron app for current OS |
 
 ### Running Tests
 
 ```bash
 # All tests (unit + vitest + ecosystem + e2e)
-npm run test:all
+ppnpm run test:all
 
 # Single test file (Node.js native test runner — most tests use this)
 node --import tsx/esm --test tests/unit/your-file.test.ts
@@ -53,19 +53,19 @@ node --import tsx/esm --test tests/unit/security-fase01.test.ts
 node --import tsx/esm --test tests/integration/*.test.ts
 
 # Vitest (MCP server, autoCombo)
-npm run test:vitest
+ppnpm run test:vitest
 
 # E2E with Playwright
-npm run test:e2e
+ppnpm run test:e2e
 
 # Protocol clients E2E (MCP transports, A2A)
-npm run test:protocols:e2e
+ppnpm run test:protocols:e2e
 
 # Ecosystem compatibility tests
-npm run test:ecosystem
+ppnpm run test:ecosystem
 
 # Coverage (see CONTRIBUTING.md)
-npm run test:coverage
+ppnpm run test:coverage
 ```
 
 **For authoritative coverage requirements, test execution, and PR gates, see [`CONTRIBUTING.md`](CONTRIBUTING.md#running-tests).**

@@ -9,6 +9,7 @@ import {
   COLORS,
   withBodyTimeout,
 } from "../utils/stream.ts";
+import { reserveReasoningTokenBudget } from "../utils/tokenBudget.ts";
 import { ensureStreamReadiness } from "../utils/streamReadiness.ts";
 import { createStreamController, pipeWithDisconnect } from "../utils/streamHandler.ts";
 import { createSseHeartbeatTransform } from "../utils/sseHeartbeat.ts";
@@ -2591,6 +2592,8 @@ export async function handleChatCore({
       }
     }
   }
+
+  reserveReasoningTokenBudget(translatedBody, { provider, model, targetFormat, log });
 
   // Resolve executor with optional upstream proxy (CLIProxyAPI) routing.
   // mode="native" (default): returns the native executor unchanged.

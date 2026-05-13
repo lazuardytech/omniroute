@@ -438,7 +438,7 @@ OmniRoute solves the problem of managing multiple AI provider subscriptions, quo
 
 5. **Database layer:** Operations go through `src/lib/db/` modules (21 domain-specific files). `localDb.ts` is re-exports only — add new functions to the proper `db/*.ts` module.
 
-6. **Tests use Node.js built-in test runner:** 122 unit test files. Run `npm test`. Vitest for MCP/autoCombo (`npm run test:vitest`). Playwright for E2E (`npm run test:e2e`).
+6. **Tests use Node.js built-in test runner:** 122 unit test files. Run `pnpm test`. Vitest for MCP/autoCombo (`pnpm run test:vitest`). Playwright for E2E (`pnpm run test:e2e`).
 
 7. **MCP and A2A pages are embedded as tabs inside `/dashboard/endpoint`**, not standalone routes.
 
@@ -448,7 +448,7 @@ OmniRoute solves the problem of managing multiple AI provider subscriptions, quo
 
 10. **Docker:** Dockerfile has two targets: `runner-base` and `runner-cli`. `docker-compose.yml` for dev (3 profiles), `docker-compose.prod.yml` for production (port 20130).
 
-11. **Electron desktop app** in `electron/` with main.js and preload.js. Build with `npm run electron:build` (supports Windows, macOS, Linux).
+11. **Electron desktop app** in `electron/` with main.js and preload.js. Build with `pnpm run electron:build` (supports Windows, macOS, Linux).
 
 12. **Pricing data** syncs from LiteLLM via `src/lib/pricingSync.ts`. Use `sync_pricing` MCP tool or API endpoint.
 

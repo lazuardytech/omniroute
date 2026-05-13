@@ -386,9 +386,9 @@ For remote access via Cloudflare Workers (without exposing the VM directly):
 ```bash
 # In the local repository
 cd omnirouteCloud
-npm install
-npx wrangler login
-npx wrangler deploy
+pnpm install
+pnpm exec wrangler login
+pnpm exec wrangler deploy
 ```
 
 See the full documentation at [omnirouteCloud/README.md](../omnirouteCloud/README.md).

@@ -324,10 +324,10 @@ Model: cc/claude-opus-4-7
 
 ## 🚀 Deployment
 
-### Global npm install (Recommended)
+### Global pnpm install (Recommended)
 
 ```bash
-npm install -g omniroute
+pnpm install -g omniroute
 
 # Create config directory
 mkdir -p ~/.omniroute
@@ -349,8 +349,8 @@ When you no longer need OmniRoute, we provide two quick scripts for a clean remo
 
 | Command                  | Action                                                                              |
 | ------------------------ | ----------------------------------------------------------------------------------- |
-| `npm run uninstall`      | Removes the system app but **keeps your DB and configurations** in `~/.omniroute`.  |
-| `npm run uninstall:full` | Removes the app AND permanently **erases all configurations, keys, and databases**. |
+| `pnpm run uninstall`      | Removes the system app but **keeps your DB and configurations** in `~/.omniroute`.  |
+| `pnpm run uninstall:full` | Removes the app AND permanently **erases all configurations, keys, and databases**. |
 
 > Note: To run these commands, navigate to the OmniRoute project folder (if you cloned it) and run them. Alternatively, if globally installed, you can simply run `npm uninstall -g omniroute`.
 
@@ -358,7 +358,7 @@ When you no longer need OmniRoute, we provide two quick scripts for a clean remo
 
 ```bash
 git clone https://github.com/diegosouzapw/OmniRoute.git
-cd OmniRoute && npm install && npm run build
+cd OmniRoute && pnpm install && pnpm run build
 
 export JWT_SECRET="your-secure-secret-change-this"
 export INITIAL_PASSWORD="your-password"
@@ -369,7 +369,7 @@ export NODE_ENV="production"
 export NEXT_PUBLIC_BASE_URL="http://localhost:20128"
 export API_KEY_SECRET="endpoint-proxy-api-key-secret"
 
-npm run start
+pnpm run start
 # Or: pm2 start npm --name omniroute -- start
 ```
 
@@ -461,10 +461,10 @@ do_build() {
 	esac
 
 	# 1) Install all deps – skip scripts
-	NODE_ENV=development npm ci --ignore-scripts
+	NODE_ENV=development ppnpm install --frozen-lockfile --ignore-scripts
 
 	# 2) Build the Next.js standalone bundle
-	npm run build
+	pnpm run build
 
 	# 3) Copy static assets into standalone
 	cp -r .next/static .next/standalone/.next/static
@@ -489,7 +489,7 @@ do_build() {
 }
 
 do_check() {
-	npm run test:unit
+	pnpm run test:unit
 }
 
 do_install() {
@@ -929,10 +929,10 @@ OmniRoute is available as a native desktop application for Windows, macOS, and L
 ```bash
 # From the electron directory:
 cd electron
-npm install
+pnpm install
 
 # Development mode (connect to running Next.js dev server):
-npm run dev
+pnpm run dev
 
 # Production mode (uses standalone build):
 npm start
@@ -942,10 +942,10 @@ npm start
 
 ```bash
 cd electron
-npm run build          # Current platform
-npm run build:win      # Windows (.exe NSIS)
-npm run build:mac      # macOS (.dmg universal)
-npm run build:linux    # Linux (.AppImage)
+pnpm run build          # Current platform
+pnpm run build:win      # Windows (.exe NSIS)
+pnpm run build:mac      # macOS (.dmg universal)
+pnpm run build:linux    # Linux (.AppImage)
 ```
 
 Output → `electron/dist-electron/`
