@@ -228,7 +228,7 @@ export default function LoginPage() {
                   <span className="material-symbols-outlined text-white text-[20px]">hub</span>
                 </div>
                 <span className="text-xl font-semibold text-text-main tracking-tight">
-                  OmniRoute
+                  Melma API
                 </span>
               </div>
               <h1 className="text-2xl font-bold text-text-main tracking-tight">{t("signIn")}</h1>
@@ -253,7 +253,6 @@ export default function LoginPage() {
                     {error}
                   </p>
                 )}
-                <p className="text-xs text-text-muted/60 pt-0.5">{t("defaultPasswordHint")}</p>
               </div>
 
               <Button
@@ -265,15 +264,6 @@ export default function LoginPage() {
                 {t("continue")}
               </Button>
             </form>
-
-            <div className="mt-6 pt-6 border-t border-border">
-              <a
-                href="/forgot-password"
-                className="text-sm text-text-muted hover:text-primary transition-colors"
-              >
-                {t("forgotPassword")}
-              </a>
-            </div>
           </div>
         </div>
 
