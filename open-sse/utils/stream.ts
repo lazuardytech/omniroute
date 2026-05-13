@@ -184,6 +184,52 @@ function appendBoundedText(current: string, next: string): string {
   return combined.slice(-STREAM_SUMMARY_TEXT_LIMIT);
 }
 
+function extractReasoningSummaryText(value: unknown): string | null {
+  const summary = asRecord(value);
+
+  const direct = typeof summary.content === "string" ? summary.content.trim() : "";
+  if (direct.length > 0) return direct;
+
+  const nested = asRecord(summary.summary);
+  const nestedContent = typeof nested.content === "string" ? nested.content.trim() : "";
+  return nestedContent.length > 0 ? nestedContent : null;
+}
+
+function buildReasoningSummaryCompatChunk(
+  chunk: Record<string, unknown>,
+  summaryText: string
+): Record<string, unknown> {
+  const compatChunk: Record<string, unknown> = {
+    id:
+      typeof chunk.id === "string" && chunk.id.trim().length > 0
+        ? chunk.id
+        : `chatcmpl-${Date.now()}`,
+    object:
+      typeof chunk.object === "string" && chunk.object.trim().length > 0
+        ? chunk.object
+        : "chat.completion.chunk",
+    created:
+      typeof chunk.created === "number" && Number.isFinite(chunk.created)
+        ? chunk.created
+        : Math.floor(Date.now() / 1000),
+    model:
+      typeof chunk.model === "string" && chunk.model.trim().length > 0 ? chunk.model : "unknown",
+    choices: [
+      {
+        index: 0,
+        delta: { reasoning_content: summaryText },
+        finish_reason: null,
+      },
+    ],
+  };
+
+  if (chunk.system_fingerprint !== undefined) {
+    compatChunk.system_fingerprint = chunk.system_fingerprint;
+  }
+
+  return compatChunk;
+}
+
 function toStreamFailureStatus(value: unknown): number | null {
   if (typeof value === "number" && Number.isInteger(value) && value >= 400 && value <= 599) {
     return value;
@@ -1189,6 +1235,47 @@ export function createSSEStream(options: StreamOptions = {}) {
                   parsed = sanitizeStreamingChunk(parsed);
 
                   const idFixed = fixInvalidId(parsed);
+
+                  const parsedRecord = asRecord(parsed);
+                  const summaryText = extractReasoningSummaryText(parsedRecord.reasoning_summary);
+                  const firstChoice = Array.isArray(parsedRecord.choices)
+                    ? asRecord(parsedRecord.choices[0])
+                    : {};
+                  const firstDelta = asRecord(firstChoice.delta);
+                  const hasTextDelta =
+                    typeof firstDelta.content === "string" && firstDelta.content.length > 0;
+                  const hasReasoningDelta =
+                    typeof firstDelta.reasoning_content === "string" &&
+                    firstDelta.reasoning_content.length > 0;
+                  const hasToolDelta =
+                    Array.isArray(firstDelta.tool_calls) && firstDelta.tool_calls.length > 0;
+                  const hasFinishReason =
+                    typeof firstChoice.finish_reason === "string" &&
+                    firstChoice.finish_reason.length > 0;
+
+                  // Compatibility shim: when providers emit a terminal reasoning summary as a
+                  // standalone chunk (`choices: []`), mirror it to an OpenAI-style
+                  // `delta.reasoning_content` chunk while still forwarding the original summary
+                  // envelope unchanged for clients that consume it directly.
+                  if (
+                    summaryText &&
+                    !hasTextDelta &&
+                    !hasReasoningDelta &&
+                    !hasToolDelta &&
+                    !hasFinishReason
+                  ) {
+                    const compatChunk = buildReasoningSummaryCompatChunk(parsedRecord, summaryText);
+                    const compatOutput = `data: ${JSON.stringify(compatChunk)}\n`;
+                    passthroughAccumulatedReasoning = appendBoundedText(
+                      passthroughAccumulatedReasoning,
+                      summaryText
+                    );
+                    totalContentLength += summaryText.length;
+                    clientPayloadCollector.push(compatChunk);
+                    reqLogger?.appendConvertedChunk?.(compatOutput);
+                    controller.enqueue(encoder.encode(compatOutput));
+                    controller.enqueue(encoder.encode("\n"));
+                  }
 
                   if (!hasValuableContent(parsed, FORMATS.OPENAI)) {
                     continue;

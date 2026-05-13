@@ -455,6 +455,59 @@ test("createSSEStream passthrough splits mixed reasoning and content deltas and 
   assert.ok(onCompletePayload.responseBody.usage.total_tokens > 0);
 });
 
+test("createSSEStream passthrough forwards summary-only reasoning chunks and emits compatibility reasoning_content", async () => {
+  let onCompletePayload = null;
+  const summaryText = "Used distributive multiplication to compute the product.";
+  const text = await readTransformed(
+    [
+      `data: ${JSON.stringify({
+        id: "chatcmpl_summary",
+        object: "chat.completion.chunk",
+        created: 1,
+        model: "mercury-2",
+        choices: [{ index: 0, delta: { content: "56088" } }],
+      })}\n\n`,
+      `data: ${JSON.stringify({
+        id: "chatcmpl_summary",
+        object: "chat.completion.chunk",
+        created: 1,
+        model: "mercury-2",
+        choices: [{ index: 0, delta: {}, finish_reason: "stop" }],
+      })}\n\n`,
+      `data: ${JSON.stringify({
+        id: "chatcmpl_summary",
+        object: "chat.completion.chunk",
+        created: 1,
+        model: "mercury-2",
+        choices: [],
+        reasoning_summary: { content: summaryText, status: "complete" },
+      })}\n\n`,
+    ],
+    {
+      mode: "passthrough",
+      sourceFormat: FORMATS.OPENAI,
+      provider: "inception",
+      model: "mercury-2",
+      body: {
+        messages: [{ role: "user", content: "compute 123*456" }],
+      },
+      onComplete(payload) {
+        onCompletePayload = payload;
+      },
+    }
+  );
+
+  assert.match(text, /"reasoning_summary":\{"content":"Used distributive multiplication to compute the product\."/);
+  assert.match(
+    text,
+    /"delta":\{"reasoning_content":"Used distributive multiplication to compute the product\."\},"finish_reason":null/
+  );
+  assert.equal(
+    onCompletePayload.responseBody.choices[0].message.reasoning_content,
+    "Used distributive multiplication to compute the product."
+  );
+});
+
 test("createSSEStream passthrough merges Claude usage chunks and restores mapped tool names", async () => {
   let onCompletePayload = null;
   const text = await readTransformed(

@@ -39,6 +39,22 @@ describe("hasValuableContent", () => {
       const chunk = { choices: [{ delta: { role: "assistant" } }] };
       assert.strictEqual(hasValuableContent(chunk, FORMATS.OPENAI), true);
     });
+
+    it("returns true for top-level reasoning_summary with empty choices", () => {
+      const chunk = {
+        choices: [],
+        reasoning_summary: { content: "Computed result.", status: "complete" },
+      };
+      assert.strictEqual(hasValuableContent(chunk, FORMATS.OPENAI), true);
+    });
+
+    it("returns true for top-level reasoning_summary even when summary content is unavailable", () => {
+      const chunk = {
+        choices: [],
+        reasoning_summary: { content: null, status: "unavailable" },
+      };
+      assert.strictEqual(hasValuableContent(chunk, FORMATS.OPENAI), true);
+    });
   });
 
   describe("Claude format", () => {

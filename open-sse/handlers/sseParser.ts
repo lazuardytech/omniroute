@@ -71,6 +71,17 @@ function toNumber(value, fallback = 0) {
   return fallback;
 }
 
+function extractReasoningSummaryText(value) {
+  const summary = toRecord(value);
+
+  const direct = typeof summary.content === "string" ? summary.content.trim() : "";
+  if (direct.length > 0) return direct;
+
+  const nested = toRecord(summary.summary);
+  const nestedContent = typeof nested.content === "string" ? nested.content.trim() : "";
+  return nestedContent.length > 0 ? nestedContent : null;
+}
+
 export function parseSSEToOpenAIResponse(rawSSE, fallbackModel) {
   const lines = String(rawSSE || "").split("\n");
   const chunks = [];
@@ -108,6 +119,8 @@ export function parseSSEToOpenAIResponse(rawSSE, fallbackModel) {
   let unknownToolCallSeq = 0;
   let finishReason = "stop";
   let usage = null;
+  let reasoningSummary;
+  const reasoningSummaryParts = [];
 
   const getToolCallKey = (toolCall: Record<string, unknown>) => {
     if (Number.isInteger(toolCall?.index)) return `idx:${toolCall.index}`;
@@ -133,6 +146,14 @@ export function parseSSEToOpenAIResponse(rawSSE, fallbackModel) {
       !delta.reasoning_content
     ) {
       reasoningParts.push(delta.reasoning);
+    }
+
+    if (Object.prototype.hasOwnProperty.call(chunk, "reasoning_summary")) {
+      reasoningSummary = chunk.reasoning_summary;
+      const summaryText = extractReasoningSummaryText(chunk.reasoning_summary);
+      if (summaryText && reasoningSummaryParts[reasoningSummaryParts.length - 1] !== summaryText) {
+        reasoningSummaryParts.push(summaryText);
+      }
     }
 
     // T18: Accumulate tool calls correctly across streamed chunks
@@ -177,7 +198,10 @@ export function parseSSEToOpenAIResponse(rawSSE, fallbackModel) {
   }
 
   const joinedContent = contentParts.length > 0 ? contentParts.join("").trim() : "";
-  const joinedReasoning = reasoningParts.length > 0 ? reasoningParts.join("").trim() : null;
+  const joinedSummaryReasoning =
+    reasoningSummaryParts.length > 0 ? reasoningSummaryParts.join("\n").trim() : null;
+  const joinedReasoning =
+    reasoningParts.length > 0 ? reasoningParts.join("").trim() : joinedSummaryReasoning;
   const message: Record<string, unknown> = {
     role: "assistant",
     content: joinedContent,
@@ -212,6 +236,9 @@ export function parseSSEToOpenAIResponse(rawSSE, fallbackModel) {
 
   if (usage) {
     result.usage = usage;
+  }
+  if (reasoningSummary !== undefined) {
+    result.reasoning_summary = reasoningSummary;
   }
 
   return result;

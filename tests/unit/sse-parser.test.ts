@@ -38,6 +38,23 @@ test("parseSSEToOpenAIResponse concatenates content, reasoning, and usage from m
   });
 });
 
+test("parseSSEToOpenAIResponse preserves reasoning_summary and mirrors it into reasoning_content when needed", () => {
+  const rawSSE = [
+    'data: {"id":"chatcmpl_2b","choices":[{"index":0,"delta":{"content":"56088"}}]}',
+    'data: {"id":"chatcmpl_2b","choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}',
+    'data: {"id":"chatcmpl_2b","choices":[],"reasoning_summary":{"content":"Used distributive multiplication.","status":"complete"}}',
+  ].join("\n");
+
+  const parsed = parseSSEToOpenAIResponse(rawSSE, "fallback-model");
+
+  assert.equal(parsed.choices[0].message.content, "56088");
+  assert.equal(parsed.choices[0].message.reasoning_content, "Used distributive multiplication.");
+  assert.deepEqual(parsed.reasoning_summary, {
+    content: "Used distributive multiplication.",
+    status: "complete",
+  });
+});
+
 test("parseSSEToOpenAIResponse ignores malformed and non-data lines", () => {
   const rawSSE = [
     "event: message",
